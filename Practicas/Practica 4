@@ -1,0 +1,20 @@
+//1
+df.describe ("High").show //Describe los valores estadisticos de la columna seleccionada
+//2 
+df.select ("High","Close").show // Despliega los valores relacionados de las columnas consultadas.
+//3 
+df.select ("Open","Low").filter("Close < 480").show // Despliega la colummnas relacionadas y seleccionadas y pone un filtro para solo desplegar las que sean menor a 480
+//4 
+df.groupBy ("Open").show
+//5
+df.first //   retorna la primera columna del dataframe
+//6 
+df.columns // Retorna las columnas de dataframe
+//7 
+val df2 = df.withColumn("HV Ratio", df("High")+df("Volume")) // Agrega una columna que deriva de la columna high y Volume
+//8 
+df.select(min("Volume")).show() // Optiene el min de la columna volume 
+//9 
+df.select(max("Volume")).show() // Optiene el max de la columna volume
+//10
+val df2 = df.withColumn("Year", year(df("Date"))) // Crea la columa año apartir de la columna date
