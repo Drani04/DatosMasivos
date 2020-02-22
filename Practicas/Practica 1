@@ -29,3 +29,19 @@ else
 //   imprimir "Estoy ecribiendo un tweet"
 val bird = "tweet"
 val interpolar = "Estoy escribiendo un "+ bird
+
+//4. Dada la variable mensaje = "Hola Luke yo soy tu padre!" utiliza slilce para extraer la 
+//secuencia "Luke"
+
+val  star  =  " Hola Luke Yo soy tu padre "
+    star.slice ( 5 , 10 )
+
+//5. Cual es la diferencia en value y una variable en scala?
+
+// La variable puede cambiar de valor y se denomina variable mutable
+// El valor es una variable que no puede cambiar de valor y se llama variable inmutable.
+
+//6. Dada la tupla ((2,4,5),(1,2,3),(3.1416,23))) regresa el numero 3.1416
+
+val  tupla  = (( 2 , 4 , 5 ), ( 1 , 2 , 3 ), ( 3.1416 , 23 ))
+println (tupla._3)
