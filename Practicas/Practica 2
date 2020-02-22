@@ -1,0 +1,17 @@
+//Practice 2
+// 1. Crea una lista llamada "lista" con los elementos "rojo", "blanco", "negro"
+val lista = List("rojo","blanco","negro")
+ println(lista)
+ 
+
+// 2. Añadir 5 elementos mas a "lista" "verde" ,"amarillo", "azul", "naranja", "perla"
+lista.Añadir("verde" ,"amarillo", "azul", "naranja", "perla")
+val c1 = "Verde" :: lista
+val c2 = "Amarillo" :: c1
+val c3 = "Azul" :: c2
+val c4 = "Naranja" :: c3
+val c5 = "Perla" :: c4
+
+// 3. Traer los elementos de "lista" "verde", "amarillo", "azul"
+var lista = List("rojo", "blanco", "negro","verde","amarillo","azul", "naranja", "perla")
+lista.slice(3,6)
