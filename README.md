@@ -166,11 +166,217 @@ val pipeline = new Pipeline()
 ```
 
 ## Practice 3
+Gradient-Boosted Tree Classifier
+```
+import org.apache.spark.ml.Pipeline
+import org.apache.spark.ml.classification.{GBTClassificationModel, GBTClassifier}
+import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
+import org.apache.spark.ml.feature.{IndexToString, StringIndexer, VectorIndexer} 
+```
+Load and parse the data file, converting it to a DataFrame.
+```
+val data = spark.read.format("libsvm").load("data/mllib/sample_libsvm_data.txt")
+```
+Index labels, adding metadata to the label column.
+Fit on whole dataset to include all labels in index.
+```
+val labelIndexer = new StringIndexer().setInputCol("label").setOutputCol("indexedLabel").fit(data)
+```
+Automatically identify categorical features, and index them.
+Set maxCategories so features with > 4 distinct values are treated as continuous.
+```
+val featureIndexer = new VectorIndexer().setInputCol("features").setOutputCol("indexedFeatures").setMaxCategories(4).fit(data)
+```
+Split the data into training and test sets (30% held out for testing).
+```
+val Array(trainingData, testData) = data.randomSplit(Array(0.7, 0.3)) 
+```
+Train a GBT model.
+```
+val gbt = new GBTClassifier().setLabelCol("indexedLabel").setFeaturesCol("indexedFeatures").setMaxIter(10).setFeatureSubsetStrategy("auto")
+ ```
+Convert indexed labels back to original labels.
+```
+val labelConverter = new IndexToString().setInputCol("prediction").setOutputCol("predictedLabel").setLabels(labelIndexer.labels)
+```
+Chain indexers and GBT in a Pipeline.
+```
+val pipeline = new Pipeline().setStages(Array(labelIndexer, featureIndexer, gbt, labelConverter))
+```
+Train model. This also runs the indexers.
+```
+val model = pipeline.fit(trainingData)
+```
+Make predictions.
+```
+val predictions = model.transform(testData)
+```
+Select example rows to display.
+```
+predictions.select("predictedLabel", "label", "features").show(5)
+``` 
+Select (prediction, true label) and compute test error.
+```
+val evaluator = new 
+MulticlassClassificationEvaluator().setLabelCol("indexedLabel").setPredictionCol("prediction").setMetricName("accuracy")
+val accuracy = evaluator.evaluate(predictions)
+println(s"Test Error = ${1.0 - accuracy}") 
+val gbtModel = model.stages(2).asInstanceOf[GBTClassificationModel]
+println(s"Learned classification GBT model:\n ${gbtModel.toDebugString}")
+```
 
 ## Practice 4
+Multilayer Perceptron
+```
+package org.apache.spark.examples.ml
+import org.apache.spark.ml.classification.MultilayerPerceptronClassifier
+import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
+import org.apache.spark.sql.SparkSession
+```
+An example of multilayer perceptron classification.
+Step 1: create a Spark session where the class is as follows:
+```
+object MultilayerPerceptronClassifierExample
+ {
+  def main(args: Array[String]): Unit = {
+	val spark = SparkSession.builder.appName("MultilayerPerceptronClassifierExample").getOrCreate()
+```
+Step 2: load and analyze the dataset, load the stored data in LIBSVM format as a DataFrame.
+Here Spark store is set to "/usr/local/spark-2.3.4-bin-hadoop2.6/data/mllib/s", but you need to configure its path accordingly
+```
+val data = spark.read.format("libsvm").load("/usr/local/spark-2.3.4-bin-hadoop2.6/data/mllib/sample_multiclass_classification_data.txt")
+``` 
+Step 3: preparing the training and test set Prepare the train and the test set: training => 60%, test => 40% and seed => 12345L
+```
+ val splits = data.randomSplit(Array(0.6, 0.4), seed = 1234L)
+	val train = splits(0)
+	val test = splits(1) 
+ ```
+Step 4: Specify the layers for the neural network Specify the layers for the neural network as follows: input layer => size 4 (characteristics), two intermediate layers (i.e. hidden layer) of size 5 and 4 and output => size 3 (classes).
+```
+	val layers = Array[Int](4, 5, 4, 3)
+```
+Step 5: create the MultilayerPerceptronClassifier trainer and set its parameters
+```
+val trainer = new MultilayerPerceptronClassifier().setLayers(layers).setBlockSize(128).setSeed(1234L).setMaxIter(100)
+```
+Step 6: Train the multilayer perceptron classification model using the estimator Train the multilayer perceptron classification model using the estimator above (i.e. trainer)
+```	
+ val model = trainer.fit(train)
+```
+Step 7: calculate the accuracy on the test set
+```
+	val result = model.transform(test)
+	val predictionAndLabels = result.select("prediction", "label")
+```
+Step 8: evaluate the model for prediction performance
+```
+	val evaluator = new MulticlassClassificationEvaluator().setMetricName("accuracy")
+```	
+```
+Step 9: dummy adjustment if necessary if the classifier performance is low enough. One reason is that the Perceptron is very shallow, the size of the data set is also smaller; therefore, we should continue to try to drill down by at least increasing the size of the hidden layers.
+ 
+ ```
+ println(s"Test set accuracy = ${evaluator.evaluate(predictionAndLabels)}")
+	// $example off$
+  //Paso 10: detener la sesión de Spark
+	spark.stop()
+  }
+}
+```
+
 ## Practice 5
+We import libraries
+```
+package org.apache.spark.examples.ml
+import org.apache.spark.ml.classification.LinearSVC
+import org.apache.spark.sql.SparkSession
+``` 
+Create session spark variable
+```
+val spark=SparkSession.builder.appName("LinearSVCExample").getOrCreate()
+```
+We load the data from our file and add it to a variable to train
+```
+val training=spark.read.format("libsvm").load("/usr/local/spark-2.3.4-bin-hadoop2.6/data/mllib/sample_libsvm_data.txt")
+```
+We create an object of type LinearSVC, we set the number of iterations to 10 with the setMaxIter method, Set the regularization parameter
+```
+val lsvc = new LinearSVC().setMaxIter(10).setRegParam(0.1)
+```
+Fit the model
+```
+val lsvcModel = lsvc.fit(training)
+```
+We print the coefficients of the vector and its interception
+```
+println(s"Coefficients: ${lsvcModel.coefficients} Intercept: ${lsvcModel.intercept}")
+```
+
 ## Practice 6
+We import the libraries and packages necessary to load the program.
+```
+import  org.apache.spark.ml.classification. { LogisticRegression ,  OneVsRest } 
+import  org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
+import org.apache.spark.sql.SparkSession
+```
+Create an instance of the spark session
+```
+val spark = SparkSession.builder.appName("OneVsRestExample").getOrCreate()
+```
+Loading our dataset 
+```
+val Data = spark.read.format("libsvm").load("sample_multiclass_classification_data.txt")
+Data.show()
+```
+Later we carry out our training with our data as follows:
+divide the data into training and test sets using an array (20% for testing and 80% training).
+ ```
+ val Array(train, test) = inputData.randomSplit(Array(0.8, 0.2))
+```
+We instantiate the base of the classifier which will contain the maximum of interactions, tolerance and interceptions adjustment.
+```
+val classifier = new LogisticRegression().setMaxIter(10).setTol(1E-6).setFitIntercept(true)
+```
+We generate the OneVsRest instances which will bring us the classifier
+```
+val ovr = new OneVsRest().setClassifier(classifier)
+```
+Training of the multiclass model generating an adjustment to the training data
+```
+val ovrModel = ovr.fit(train)
+```
+We transform the test data into the prediction method
+```
+val predictions = ovrModel.transform(test)
+```
+We generate the evaluator which we will bring the instance name of the metric
+```
+val evaluator = new MulticlassClassificationEvaluator().setMetricName("accuracy")
+```
+calculates the classification error in the test data.
+```
+val accuracy = evaluator.evaluate(predictions)
+println(s"Test Error = ${1 - accuracy}")
+```
+
 ## Practice 7
+```
+import org.apache.spark.ml.classification.NaiveBayes
+import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
+```
+Cargue los datos almacenados en formato LIBSVM como un DataFrame
+```
+val data = spark.read.format("libsvm").load("data/sample_libsvm_data.txt")
+```
+Dividir los datos en conjuntos de entrenamiento y prueba (30% para pruebas)
+```
+val Array(trainingData, testData) = data.randomSplit(Array(0.7, 0.3), seed = 1234L)
+```
+Entrenar el modelo naive bayes.
+```
+val model = new NaiveBayes().fit(trainingData)
+```
 
 ## Evaluation
 We import the libraries to use
