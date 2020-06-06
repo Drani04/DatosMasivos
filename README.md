@@ -488,3 +488,6 @@ println(s"Test set accuracy = ${evaluator.evaluate(predictionAndLabels)}")
 ![img](https://github.com/Drani04/DatosMasivos/blob/Unit-2/images/dme9.png)
 
 ## Colaborators
+- [Hernandez Marín Betzibeth Magdalena](https://github.com/BetzibethHrdz)
+- [Luis Daniel Lopez Valencia](https://github.com/Drani04)
+
