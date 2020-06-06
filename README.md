@@ -73,8 +73,6 @@ import org.apache.spark.ml.Pipeline
 import org.apache.spark.ml.classification.DecisionTreeClassificationModel
 import org.apache.spark.ml.classification.DecisionTreeClassifier
 import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
-```
-```
 val data = spark.read.format("libsvm").load("data/mllib/sample_libsvm_data.txt")
 ```
 Index labels, adding metadata to the label column.
@@ -94,7 +92,7 @@ val Array(trainingData, testData) = data.randomSplit(Array(0.7, 0.3))
 Train a DecisionTree model.
 ```
 val dt = new DecisionTreeClassifier().setLabelCol("indexedLabel").setFeaturesCol("indexedFeatures")
- ```
+```
 Convert indexed labels back to original labels.
 ```
 val labelConverter = new IndexToString().setInputCol("prediction").setOutputCol("predictedLabel").setLabels(labelIndexer.labels)
@@ -123,6 +121,7 @@ println(s"Test Error = ${(1.0 - accuracy)}")
 val treeModel = model.stages(2).asInstanceOf[DecisionTreeClassificationModel]
 println(s"Learned classification tree model:\n ${treeModel.toDebugString}")
 ```
+
 ## Practice 2
 Random Forest Classifier
 ```
@@ -158,7 +157,7 @@ Convert indexed labels back to original labels.
 val labelConverter = new IndexToString().setInputCol("prediction").setOutputCol("predictedLabel")
 setLabels(labelIndexer.labels) 
 ```
-// Chain indexers and forest in a Pipeline.
+Chain indexers and forest in a Pipeline.
 ```
 val pipeline = new Pipeline()
 ```
@@ -249,7 +248,7 @@ Step 3: preparing the training and test set Prepare the train and the test set: 
  val splits = data.randomSplit(Array(0.6, 0.4), seed = 1234L)
 	val train = splits(0)
 	val test = splits(1) 
- ```
+```
 Step 4: Specify the layers for the neural network Specify the layers for the neural network as follows: input layer => size 4 (characteristics), two intermediate layers (i.e. hidden layer) of size 5 and 4 and output => size 3 (classes).
 ```
 	val layers = Array[Int](4, 5, 4, 3)
@@ -264,13 +263,12 @@ Step 6: Train the multilayer perceptron classification model using the estimator
 ```
 Step 7: calculate the accuracy on the test set
 ```
-	val result = model.transform(test)
-	val predictionAndLabels = result.select("prediction", "label")
+val result = model.transform(test)
+val predictionAndLabels = result.select("prediction", "label")
 ```
 Step 8: evaluate the model for prediction performance
 ```
 	val evaluator = new MulticlassClassificationEvaluator().setMetricName("accuracy")
-```	
 ```
 Step 9: dummy adjustment if necessary if the classifier performance is low enough. One reason is that the Perceptron is very shallow, the size of the data set is also smaller; therefore, we should continue to try to drill down by at least increasing the size of the hidden layers.
  
