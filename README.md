@@ -64,3 +64,103 @@ Example:
 Out of 8 real cats, the system predicted that three were dogs and out of six dogs predicted that one was a rabbit and two were cats. From the matrix it can be seen that the system has trouble distinguishing between cats and dogs, but can reasonably well distinguish between rabbits and other animals.
 
 ![img](https://github.com/Drani04/DatosMasivos/blob/Unit-2/images/matriz.png)
+
+Practice 1
+
+## Evaluation
+We import the libraries to use
+```
+import org.apache.spark.ml.classification.MultilayerPerceptronClassifier 
+import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
+import org.apache.spark.ml.feature.VectorAssembler
+import org.apache.spark.ml.feature.StringIndexer
+import org.apache.spark.ml.linalg.Vectors
+```
+Load our dataset
+```
+val data = spark.read.format("csv").option("inferSchema","true").option("header","true").csv("iris.csv")
+```
+Our database is cleaned to eliminate erroneous or null values
+```
+val Clean = data.na.drop()
+```
+
+Show column names
+```
+Clean.columns
+```
+Show the structure of the dataframe
+```
+Clean.printSchema()
+```
+Show the first 5 columns
+```
+Clean.show(5)
+```
+Give general information about dataframe data
+```
+Clean.describe().show
+```
+We generate a vector where the characteristics of the dataset to be evaluated will be stored and saved using the new column features   
+```
+val assembler = new VectorAssembler().setInputCols(Array("sepal_length","sepal_width","petal_length","petal_width")).setOutputCol("features")
+```
+We transform the data using our dataset
+```
+val featureSet = assembler.transform(Clean)
+featureSet.show()
+```
+We transform the string values ​​of the species column to numerical data to be able to use it
+```
+val labelIndexer = new StringIndexer().setInputCol("species").setOutputCol("label")
+val dataindex = labelIndexer.fit(featureSet).transform(featureSet)
+```
+show the index of species in column called label
+```
+dataindex.show()
+```
+Data is divided into training data and test data 60% for training and 40% for testing
+```
+val splits = dataindex.randomSplit(Array(0.6, 0.4), seed = 1234L)
+```
+take the value of 60% of the data
+```
+val train = splits(0)
+```
+take the value of 40% of the data
+```
+val test = splits(1)
+```
+We set the layers of our neural network input 4, 5 and 4 intermediate layer or hidden layer and exit 3.
+```
+val layers = Array[Int](4, 5, 4, 3)
+```
+We do the data training applying our multilayerPerceptron algorithm
+```
+val trainer = new MultilayerPerceptronClassifier().setLayers(layers).setBlockSize(128).setSeed(1234L).setMaxIter(100)
+```
+the model is trained with the assigned data
+```
+val model = trainer.fit(train)
+```
+is tested with the model already trained
+```
+val result = model.transform(test)
+```
+select prediction and label to save them in the predictionandlabels variable
+```
+val predictionAndLabels = result.select("prediction", "label")
+```
+show the content of the variable
+```
+predictionAndLabels.show()
+```
+The efficiency of the model is calculated
+```
+val evaluator = new MulticlassClassificationEvaluator().setMetricName("accuracy")
+```
+We print the prediction result.
+```
+println(s"Test set accuracy = ${evaluator.evaluate(predictionAndLabels)}")
+```
+
