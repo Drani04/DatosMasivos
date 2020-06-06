@@ -276,7 +276,7 @@ Step 8: evaluate the model for prediction performance
 ```
 Step 9: dummy adjustment if necessary if the classifier performance is low enough. One reason is that the Perceptron is very shallow, the size of the data set is also smaller; therefore, we should continue to try to drill down by at least increasing the size of the hidden layers.
  
- ```
+```
  println(s"Test set accuracy = ${evaluator.evaluate(predictionAndLabels)}")
 	// $example off$
   //Paso 10: detener la sesión de Spark
@@ -331,7 +331,7 @@ Data.show()
 ```
 Later we carry out our training with our data as follows:
 divide the data into training and test sets using an array (20% for testing and 80% training).
- ```
+```
  val Array(train, test) = inputData.randomSplit(Array(0.8, 0.2))
 ```
 We instantiate the base of the classifier which will contain the maximum of interactions, tolerance and interceptions adjustment.
@@ -488,6 +488,7 @@ We print the prediction result.
 ```
 println(s"Test set accuracy = ${evaluator.evaluate(predictionAndLabels)}")
 ```
+
 ![img](https://github.com/Drani04/DatosMasivos/blob/Unit-2/images/dme9.png)
 
 ## Colaborators
