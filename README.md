@@ -84,23 +84,30 @@ Our database is cleaned to eliminate erroneous or null values
 ```
 val Clean = data.na.drop()
 ```
-
 Show column names
 ```
 Clean.columns
 ```
+![img](https://github.com/Drani04/DatosMasivos/blob/Unit-2/images/dme1.png)
+
 Show the structure of the dataframe
 ```
 Clean.printSchema()
 ```
+![img](https://github.com/Drani04/DatosMasivos/blob/Unit-2/images/dme3.png)
+
 Show the first 5 columns
 ```
 Clean.show(5)
 ```
+![img](https://github.com/Drani04/DatosMasivos/blob/Unit-2/images/dme4.png)
+
 Give general information about dataframe data
 ```
 Clean.describe().show
 ```
+![img](https://github.com/Drani04/DatosMasivos/blob/Unit-2/images/dme5.png)
+
 We generate a vector where the characteristics of the dataset to be evaluated will be stored and saved using the new column features   
 ```
 val assembler = new VectorAssembler().setInputCols(Array("sepal_length","sepal_width","petal_length","petal_width")).setOutputCol("features")
@@ -110,6 +117,8 @@ We transform the data using our dataset
 val featureSet = assembler.transform(Clean)
 featureSet.show()
 ```
+![img](https://github.com/Drani04/DatosMasivos/blob/Unit-2/images/dme6.png)
+
 We transform the string values ​​of the species column to numerical data to be able to use it
 ```
 val labelIndexer = new StringIndexer().setInputCol("species").setOutputCol("label")
@@ -119,6 +128,8 @@ show the index of species in column called label
 ```
 dataindex.show()
 ```
+![img](https://github.com/Drani04/DatosMasivos/blob/Unit-2/images/dme7.png)
+
 Data is divided into training data and test data 60% for training and 40% for testing
 ```
 val splits = dataindex.randomSplit(Array(0.6, 0.4), seed = 1234L)
@@ -155,6 +166,9 @@ show the content of the variable
 ```
 predictionAndLabels.show()
 ```
+![img](https://github.com/Drani04/DatosMasivos/blob/Unit-2/images/dme8.png)
+
+
 The efficiency of the model is calculated
 ```
 val evaluator = new MulticlassClassificationEvaluator().setMetricName("accuracy")
@@ -163,4 +177,5 @@ We print the prediction result.
 ```
 println(s"Test set accuracy = ${evaluator.evaluate(predictionAndLabels)}")
 ```
+![img](https://github.com/Drani04/DatosMasivos/blob/Unit-2/images/dme9.png)
 
