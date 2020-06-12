@@ -8,13 +8,15 @@
 
 ## Evaluation 
 
-//librerias para utilizar nuestro modelo Kmeans
+importamos las librerias para utilizar nuestro modelo Kmeans
+```
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.ml.feature.VectorAssembler
 import org.apache.spark.ml.feature.StringIndexer
 import org.apache.log4j._
 import org.apache.spark.ml.clustering.KMeans
 import org.apache.spark.ml.linalg.Vectors
+```
 
 importamos sesion en spark
 ```
