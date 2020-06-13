@@ -68,6 +68,10 @@ Muestra los resultados
 println("Cluster Centers: ")
 model.clusterCenters.foreach(println)
 ```
+## Link To Video
+```
+https://youtu.be/FGz9lJZhcAY
+```
 
 ## Colaborators
 - [Hernandez Marín Betzibeth Magdalena](https://github.com/BetzibethHrdz)
