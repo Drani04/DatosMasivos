@@ -13,6 +13,7 @@
 - Results
 - Conclusion
 - References
+- Video
 - Colaborators
 
 ## Introduction
@@ -484,6 +485,10 @@ As we could see the four models are functional for this case, they had almost th
 [3]http://diposit.ub.edu/dspace/bitstream/2445/43762/1/618361.pdf
 [4]Chitarroni, H. (2002). La regresión logística.
 [5]Peláez, I. M. (2016). Modelos de regresión: lineal simple y regresión logística. Revista Seden.
+
+
+## Video
+
 
 ## Colaborators
 - [Hernandez Marín Betzibeth Magdalena](https://github.com/BetzibethHrdz)
