@@ -9,6 +9,7 @@
 - Logistic Regresion
 - Multilayer Perceptron
 - Implementation
+- Codes
 - Results
 - Conclusion
 - References
@@ -75,6 +76,100 @@ The characteristic of this type of Network is that its connections are made from
 - As an operating system you use Windows 7 since it is the one we had but it can also be used in Linux.
 
 ![img](https://github.com/Drani04/DatosMasivos/blob/Unit-4/Images/w7.png)
+
+## Codes
+## SVM
+
+We load libraries to use
+```
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.mllib.classification.{SVMModel, SVMWithSGD}
+import org.apache.spark.mllib.evaluation.BinaryClassificationMetrics
+import org.apache.spark.mllib.util.MLUtils
+import org.apache.spark.ml.feature.{VectorAssembler, StringIndexer, OneHotEncoder}
+import org.apache.spark.ml.Pipeline
+import org.apache.spark.mllib.evaluation.MulticlassMetrics
+import org.apache.spark.ml.classification.LinearSVC
+import org.apache.log4j._
+```
+Error reduction
+```
+Logger.getLogger("org").setLevel(Level.ERROR)
+```
+We create our spark session
+```
+val spark = SparkSession.builder().getOrCreate()
+```
+We load our dataset
+```
+val data = spark.read.option("header","true").option("inferSchema","true").option("delimiter",";").format("csv").load("bank-full.csv")
+```
+We create a vector where we will store the columns that we are going to use with the name of features
+```
+val assembler = new VectorAssembler().setInputCols(Array("age","balance","day","duration","campaign","pdays","previous")).setOutputCol("features")
+```
+We apply indexing column Y so that the values ​​of yes and do not take them as numerical values ​​and we can work with them
+```
+val labelIndexer = new StringIndexer().setInputCol("y").setOutputCol("label")
+```
+We divide our dataset into 70 and 30
+```
+val Array(training, test) = data.randomSplit(Array(0.7, 0.3), seed = 11L)
+```
+We generate our prediction with LinearSVC
+```
+val lsvc = new LinearSVC().setLabelCol("label").setFeaturesCol("features").setPredictionCol("prediction").setMaxIter(10).setRegParam(0.1)
+```
+A new pipeline is created
+```
+val pipeline = new Pipeline().setStages(Array(labelIndexer,assembler, lsvc))
+```
+we fit the model
+```
+val model = pipeline.fit(training)
+```
+we use the model with 30% of the data
+```
+val result = model.transform(test)
+```
+We save results of the selected variables
+```
+val predictionAndLabelsrdd = result.select("prediction", "label")
+```
+Show predictions
+```
+predictionAndLabelsrdd.show(5)
+```
+results in the Text set
+```
+val predictionAndLabelsrdd = result.select($"prediction", $"label").as[(Double, Double)].rdd
+```
+initialize a multiclassMetrics object
+```
+val metrics = new MulticlassMetrics(predictionAndLabelsrdd)
+```
+prints the precision of the algorithm
+```
+println(s"Accuaracy Test = ${(metrics.accuracy)}")
+```
+Execution time
+```
+val t1 = System.nanoTime
+val duration = (System.nanoTime - t1) / 1e9d
+```
+Used memory
+```
+val mb = 1024*1024
+val runtime = Runtime.getRuntime
+println("** Used Memory:  " + (runtime.totalMemory - runtime.freeMemory) / mb)
+println("** Free Memory:  " + runtime.freeMemory / mb)
+println("** Total Memory: " + runtime.totalMemory / mb)
+println("** Max Memory:   " + runtime.maxMemory / mb)
+```
+
+
+
+
 
 ## Results
 
