@@ -489,6 +489,7 @@ As we could see the four models are functional for this case, they had almost th
 
 ## Video
 
+https://youtu.be/cBjeuA2ARSA
 
 ## Colaborators
 - [Hernandez Marín Betzibeth Magdalena](https://github.com/BetzibethHrdz)
