@@ -12,6 +12,7 @@
 - Results
 - Conclusion
 - References
+- Colaborators
 
 ## Introduction
 
