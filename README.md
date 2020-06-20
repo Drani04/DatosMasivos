@@ -167,9 +167,277 @@ println("** Total Memory: " + runtime.totalMemory / mb)
 println("** Max Memory:   " + runtime.maxMemory / mb)
 ```
 
+## DT
 
+We load libraries to use
+```
+import org.apache.spark.ml.Pipeline
+import org.apache.spark.ml.classification.DecisionTreeClassificationModel
+import org.apache.spark.ml.classification.DecisionTreeClassifier
+import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
+import org.apache.spark.ml.feature.IndexToString
+import org.apache.log4j._
+import org.apache.spark.ml.PipelineStage
+import org.apache.spark.ml.feature.StringIndexer
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.SQLContext
+import org.apache.spark.ml.feature.VectorIndexer
+import org.apache.spark.ml.feature.VectorAssembler
+```
+Error reduction
+```
+Logger.getLogger("org").setLevel(Level.ERROR)
+```
+We create our spark session
+```
+val spark = SparkSession.builder().getOrCreate()
+```
+We import our DataSet
+```
+val data = spark.read.option("header","true").option("inferSchema","true").option("delimiter",";").format("csv").load("bank-full.csv")
+```
+We create our label indexer to compare 
+```
+val labelIndexer = new StringIndexer().setInputCol("y").setOutputCol("indexedLabel").fit(data)
+```
+We initialize the vector assembler for numeric data and add the features column as output
+```
+val assembler = new VectorAssembler().setInputCols(Array("age","balance","day","duration","campaign","pdays","previous")).setOutputCol("features")
+val features = assembler.transform(data)
+```
+Categorically identifies our vector dataset
+```
+val featureIndexer = new VectorIndexer().setInputCol("features").setOutputCol("indexedFeatures").setMaxCategories(4).fit(features)
+```
+We divide our dataset into 70% training and 30% testing
+```
+val Array(trainingData, testData) = features.randomSplit(Array(0.7, 0.3))
+```
+We create a DecisionTree object
+```
+val dt = new DecisionTreeClassifier().setLabelCol("indexedLabel").setFeaturesCol("indexedFeatures")
+```
+Prediction branch
+```
+val labelConverter = new IndexToString().setInputCol("prediction").setOutputCol("predictedLabel").setLabels(labelIndexer.labels)
+```
+We put the data together in a pipeline
+```
+val pipeline = new Pipeline().setStages(Array(labelIndexer, featureIndexer, dt, labelConverter))
+```
+We create training model
+```
+val model = pipeline.fit(trainingData)
+```
+Data transformation in the model
+```
+val predictions = model.transform(testData)
+```
+We display predictions
+```
+predictions.select("predictedLabel", "y").show(5)
+```
+Tree model is generated
+```
+val treeModel = model.stages(2).asInstanceOf[DecisionTreeClassificationModel]
+println(s"Learned classification tree model:\n ${treeModel.toDebugString}")
+```
+We evaluate the efficiency of the model
+```
+val evaluator = new MulticlassClassificationEvaluator().setLabelCol("indexedLabel").setPredictionCol("prediction").setMetricName("accuracy")
+val accuracy = evaluator.evaluate(predictions)
+println(s"Test Error = ${(1.0 - accuracy)}")
+```
+Execution time
+```
+val t1 = System.nanoTime
+val duration = (System.nanoTime - t1) / 1e9d
+```
+Used memory
+```
+val mb = 1024*1024
+val runtime = Runtime.getRuntime
+println("** Used Memory:  " + (runtime.totalMemory - runtime.freeMemory) / mb)
+println("** Free Memory:  " + runtime.freeMemory / mb)
+println("** Total Memory: " + runtime.totalMemory / mb)
+println("** Max Memory:   " + runtime.maxMemory / mb)
+```
 
+## LR
 
+We load libraries
+```
+import org.apache.spark.sql.SparkSession
+import org.apache.log4j._
+import org.apache.spark.ml.feature.{IndexToString, StringIndexer, VectorIndexer, VectorAssembler}
+import org.apache.spark.ml.classification.LogisticRegression
+import org.apache.spark.mllib.evaluation.MulticlassMetrics
+import org.apache.spark.ml.Pipeline
+```  
+Decreased errors
+```
+Logger.getLogger("org").setLevel(Level.ERROR)
+``` 
+We create spark session
+```
+val spark = SparkSession.builder().getOrCreate()
+```    
+We load our dataset
+```
+val data = spark.read.option("header","true").option("inferSchema","true").option("delimiter",";").format("csv").load("bank-full.csv")
+``` 
+We create a vector where we will place the columns that we want to use
+```
+val assembler = new VectorAssembler().setInputCols(Array("age","balance","day","duration","campaign","pdays","previous")).setOutputCol("features")
+```  
+We index the column Y so that the values ​​of if and do not take the value of 1 and 0
+```
+val labelIndexer = new StringIndexer().setInputCol("y").setOutputCol("label")
+val dataIndexed = labelIndexer.fit(data).transform(data)
+```    
+We divide the data into 70% and 30% for training and testing
+```
+val Array(training, test) = dataIndexed.randomSplit(Array(0.7, 0.3), seed = 12345)
+```
+We create our logistic regression
+```
+val lr = new LogisticRegression()
+```
+We create our pipeline
+```
+val pipeline = new Pipeline().setStages(Array(assembler,lr))
+```
+We create our model by entering 70% of the data
+```
+val model = pipeline.fit(training)
+```
+We generate the results
+```
+val results = model.transform(test)
+```
+We generate predictions
+```
+val predictionAndLabels = results.select($"prediction",$"label").as[(Double, Double)].rdd
+```
+We create our evaluator object for prediction and labels multiclasses
+```
+val metrics = new MulticlassMetrics(predictionAndLabels)
+```    
+We print the confusion matrix 
+```
+println(metrics.confusionMatrix)
+```
+Shows the effectiveness of the model
+```
+println(s"Accuracy = ${(metrics.accuracy)}")
+println(s"Test Error = ${(1.0 - metrics.accuracy)}")
+```
+Execution time
+```
+val t1 = System.nanoTime
+val duration = (System.nanoTime - t1) / 1e9d
+```
+Used memory
+```
+val mb = 1024*1024
+val runtime = Runtime.getRuntime
+println("** Used Memory:  " + (runtime.totalMemory - runtime.freeMemory) / mb)
+println("** Free Memory:  " + runtime.freeMemory / mb)
+println("** Total Memory: " + runtime.totalMemory / mb)
+println("** Max Memory:   " + runtime.maxMemory / mb)
+```
+
+## MLP
+
+We load the libraries that we will use
+```
+import org.apache.spark.sql.SparkSession
+import org.apache.log4j._
+import org.apache.spark.ml.feature.IndexToString
+import org.apache.spark.ml.feature.VectorAssembler
+import org.apache.spark.ml.feature.VectorIndexer
+import org.apache.spark.ml.feature.StringIndexer
+import org.apache.spark.ml.classification.MultilayerPerceptronClassifier
+import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
+import org.apache.spark.ml.linalg.Vectors
+```   
+Decrease errors
+```
+Logger.getLogger("org").setLevel(Level.ERROR)
+```    
+We create spark session
+```
+val spark = SparkSession.builder().getOrCreate()
+```    
+We load our dataset
+```
+val data = spark.read.option("header","true").option("inferSchema","true").option("delimiter",";").format("csv").load("bank-full.csv")
+```
+We create a vector where we will select the columns to use from our dataset
+```
+val assembler = new VectorAssembler().setInputCols(Array("balance","day","duration","pdays","previous")).setOutputCol("features")
+val features = assembler.transform(data)
+```  
+We index the column "and" to be able to use the yes and no as 0 and 1 
+```
+val labelIndexer = new StringIndexer().setInputCol("y").setOutputCol("label")
+val dataIndexed = labelIndexer.fit(features).transform(features)
+```  
+We divide our dataset into 70% and 30% portions for training and testing our model
+```
+val split = dataIndexed.randomSplit(Array(0.7, 0.3), seed = 1234L)
+```
+We assign 70% of the total to training
+```
+val train = split(0)
+```
+We assign 30% of the total to the tests
+```
+val test = split(1)
+```
+We assign the value to the layers of our model
+```
+val layers = Array[Int](5, 2, 3, 2)
+```
+We create a trainer for our model with its parameters
+```
+val trainer = new MultilayerPerceptronClassifier().setLayers(layers).setBlockSize(128).setSeed(1234L).setMaxIter(100)
+```
+We train our model with the training created above
+```
+val model = trainer.fit(train)
+```
+Project results of our model
+```
+val result = model.transform(test)
+```    
+We create predictions with prediction and label columns
+```
+val predictionAndLabels = result.select("prediction", "label")
+```
+We visualize
+```
+predictionAndLabels.show(10)
+```
+Shows the efficiency of the model
+```
+val evaluator = new MulticlassClassificationEvaluator().setMetricName("accuracy")
+println(s"Accuracy test = ${evaluator.evaluate(predictionAndLabels)}")
+```
+Execution time
+```
+val t1 = System.nanoTime
+val duration = (System.nanoTime - t1) / 1e9d
+```
+Used memory
+```
+val mb = 1024*1024
+val runtime = Runtime.getRuntime
+println("** Used Memory:  " + (runtime.totalMemory - runtime.freeMemory) / mb)
+println("** Free Memory:  " + runtime.freeMemory / mb)
+println("** Total Memory: " + runtime.totalMemory / mb)
+println("** Max Memory:   " + runtime.maxMemory / mb)
+```
 
 ## Results
 
