@@ -66,15 +66,21 @@ The characteristic of this type of Network is that its connections are made from
 
 - We use scala as a programming language since it offers us many libraries that facilitate the handling of datasets, in addition to being a widely recognized language and easy to learn.
 
+![img](https://github.com/Drani04/DatosMasivos/blob/Unit-4/Images/scala.png)
+
 - We use spark as a framework since it is compatible with scala and offers us ease of operating with large amounts of data and is easy to use.
 
+![img](https://github.com/Drani04/DatosMasivos/blob/Unit-4/Images/spark.png)
+
 - As an operating system you use Windows 7 since it is the one we had but it can also be used in Linux.
+
+![img](https://github.com/Drani04/DatosMasivos/blob/Unit-4/Images/w7.png)
 
 ## Results
 
 
 In our first model (SVM) the following results were obtained:
-(foto)
+![img](https://github.com/Drani04/DatosMasivos/blob/Unit-4/Images/Promedios.png)
 As we can see, the efficiency and error remain constant while the execution time varies, in addition to the fact that the memory space it uses is very small.
 
 In our second model (DT) the following results were obtained:
@@ -107,5 +113,5 @@ As we could see the four models are functional for this case, they had almost th
 [5]Peláez, I. M. (2016). Modelos de regresión: lineal simple y regresión logística. Revista Seden.
 
 ## Colaborators
+- [Hernandez Marín Betzibeth Magdalena](https://github.com/BetzibethHrdz)
 - [Luis Daniel Lopez Valencia](https://github.com/Drani04)
-- [Betzibeth Magdalena Hernandez Marín](https://github.com/fernando-123)
