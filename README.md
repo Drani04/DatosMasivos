@@ -80,24 +80,34 @@ The characteristic of this type of Network is that its connections are made from
 
 
 In our first model (SVM) the following results were obtained:
-![img](https://github.com/Drani04/DatosMasivos/blob/Unit-4/Images/Promedios.png)
+
+![img](https://github.com/Drani04/DatosMasivos/blob/Unit-4/Images/LSVM.png)
+
 As we can see, the efficiency and error remain constant while the execution time varies, in addition to the fact that the memory space it uses is very small.
 
 In our second model (DT) the following results were obtained:
-(foto)
+
+![img](https://github.com/Drani04/DatosMasivos/blob/Unit-4/Images/DT.png)
+
 As we can see the efficiency and the error undergo a very minimal change on some occasions and the execution time also varies as does the memory it uses.
 
 In our following model (LR) the following results were obtained:
-(foto)
+
+![img](https://github.com/Drani04/DatosMasivos/blob/Unit-4/Images/LR.png)
+
 Al igual que SVM conseguimos una eficiencia del 88% con una probabilidad de error del 11%, la ejecución al igual que en los otros 2 sigue variando y la memoria que utiliza también.
 
 In our latest model (MLP) the following results were obtained:
-(foto)
+
+![img](https://github.com/Drani04/DatosMasivos/blob/Unit-4/Images/MLP.png)
+
 Same situation, efficiency and error remain at 88% and 11% while execution is variant as well as memory.
 
 
 To understand these tables more simply, we put them together into one with the average of each model in the different characteristics:
-(foto)
+
+![img](https://github.com/Drani04/DatosMasivos/blob/Unit-4/Images/Promedios.png)
+
 We can see that although DT had more efficiency in some cases with 1 hundredth when averaging the values, all the models achieved the same amount of efficiency and error, however, at runtime it shows us that MLP is a slightly longer model and heavy so it takes 3 seconds longer than the others, in addition to using more memory than the others this due to its layer structure, where it processes a lot of information and therefore is more robust and time consuming.
 
 
